@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-primary: #274566;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #a0c6ed;
+  --color-secondary-foreground: #274566;
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-accent: #a0c6ed;
+  --color-accent-foreground: #274566;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #274566;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+}
+
+@layer base {
+  .dark {
+    --color-background: #020617;
+    --color-foreground: #f8fafc;
+    --color-muted: #0f172a;
+    --color-muted-foreground: #94a3b8;
+    --color-accent: #1e293b;
+    --color-accent-foreground: #f8fafc;
+    --color-border: #1e293b;
+    --color-input: #1e293b;
+    --color-card: #0f172a;
+    --color-card-foreground: #f8fafc;
+  }
+
+  body {
+    @apply font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .bg-clean {
+    background-color: var(--color-background);
+    background-image: radial-gradient(circle at 50% -20%, color-mix(in srgb, var(--color-primary) 10%, transparent) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .simple-card {
+    @apply bg-card border border-border shadow-sm transition-all duration-200;
+  }
+
+  .simple-card:hover {
+    @apply border-primary/30 shadow-md;
+  }
+
+  .icon-square {
+    @apply flex items-center justify-center rounded-xl bg-primary text-primary-foreground;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+  }
+
+  .dark .gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(160, 198, 237, 0.4), 0 0 40px rgba(160, 198, 237, 0.2);
+  }
+
+  .portal-bg {
+    background: radial-gradient(circle at 50% 50%, rgba(39, 69, 102, 0.15) 0%, transparent 60%);
+  }
+
+  .icon-card-glow {
+    box-shadow: 0 0 30px rgba(39, 69, 102, 0.1);
+  }
+
+  .icon-card-glow:hover {
+    box-shadow: 0 0 50px rgba(160, 198, 237, 0.2);
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full hover:bg-primary/30 transition-colors;
+  }
+
+  /* Markdown Styles */
+  .markdown-body {
+    @apply text-muted-foreground leading-relaxed;
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    @apply text-foreground font-display font-bold mt-12 mb-6;
+  }
+  .markdown-body h1 { @apply text-4xl; }
+  .markdown-body h2 { @apply text-3xl border-b border-border pb-4; }
+  .markdown-body h3 { @apply text-2xl; }
+  .markdown-body p { @apply mb-6 text-lg; }
+  .markdown-body ul, .markdown-body ol { @apply mb-6 ml-6 space-y-2; }
+  .markdown-body ul { @apply list-disc; }
+  .markdown-body ol { @apply list-decimal; }
+  .markdown-body li { @apply pl-2; }
+  .markdown-body blockquote { @apply border-l-4 border-primary/30 pl-6 italic my-8 text-xl text-foreground/80; }
+  .markdown-body img { @apply rounded-3xl shadow-2xl my-12 w-full object-cover; }
+  .markdown-body a { @apply text-primary hover:underline font-bold; }
+  .markdown-body code { @apply bg-muted px-2 py-1 rounded text-sm font-mono text-primary; }
+  .markdown-body pre { @apply bg-muted p-6 rounded-2xl overflow-x-auto my-8 border border-border; }
+  .markdown-body pre code { @apply bg-transparent p-0 text-foreground; }
+}

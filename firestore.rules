@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: projects
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, 1-100 chars)
+    //   - description: string (required, 1-2000 chars)
+    //   - imageUrl: string (optional, URL format)
+    //   - category: string (required, 1-50 chars)
+    //   - createdAt: number (required, timestamp in ms)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "victor.nascimento@usereserva.com" || 
+         request.auth.token.email == "azzaspowerbi@gmail.com");
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidUrl(url) {
+      return url is string && (url.matches("^https://.*") || url.matches("^http://.*"));
+    }
+
+    function isValidProject(data) {
+      return hasRequiredFields(['title', 'description', 'category', 'createdAt']) &&
+             hasOnlyAllowedFields(['title', 'description', 'category', 'createdAt', 'imageUrl', 'imagePosition', 'imageFit', 'content', 'impact', 'status']) &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 100 &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 2000 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 50 &&
+             data.createdAt is number &&
+             (!('imageUrl' in data) || data.imageUrl == "" || isValidUrl(data.imageUrl)) &&
+             (!('imagePosition' in data) || (data.imagePosition is number && data.imagePosition >= 0 && data.imagePosition <= 100)) &&
+             (!('imageFit' in data) || data.imageFit in ['cover', 'contain']) &&
+             (!('content' in data) || (data.content is string && data.content.size() <= 10000)) &&
+             (!('impact' in data) || (data.impact is string && data.impact.size() <= 50)) &&
+             (!('status' in data) || (data.status is string && data.status.size() <= 50));
+    }
+
+    // ===============================================================
+    // Projects Collection
+    // ===============================================================
+    match /projects/{projectId} {
+      // Projects are public for reading
+      allow read: if true;
+      
+      // Only admins can create, update, or delete projects
+      allow create: if isAdmin() && isValidProject(request.resource.data);
+      allow update: if isAdmin() && (
+        isValidProject(request.resource.data) || 
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['content']) && request.resource.data.content is string)
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}
