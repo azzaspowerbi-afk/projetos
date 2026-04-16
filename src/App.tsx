@@ -215,12 +215,39 @@ const ProjectCard: FC<ProjectCardProps> = ({ id, title, description, imageUrl, c
     }
   }, [id]);
 
-  const handleShare = (e: React.MouseEvent) => {
+  const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     const url = `${window.location.origin}?project=${id}`;
-    navigator.clipboard.writeText(url);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        setIsCopied(true);
+      } else {
+        // Fallback for non-secure contexts or older browsers
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setIsCopied(true);
+        } catch (err) {
+          console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+      }
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+    
+    if (navigator.clipboard || document.execCommand) {
+      setTimeout(() => setIsCopied(false), 2000);
+    }
   };
 
   const handleContentImageUrlAdd = (url: string) => {
@@ -386,11 +413,20 @@ const ProjectCard: FC<ProjectCardProps> = ({ id, title, description, imageUrl, c
             </button>
             <button 
               onClick={handleShare}
-              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors min-w-[100px]"
               title="Copiar link do projeto"
             >
-              {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
-              {isCopied ? "Copiado!" : "Compartilhar"}
+              {isCopied ? (
+                <div key="copied" className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <span>Copiado!</span>
+                </div>
+              ) : (
+                <div key="share" className="flex items-center gap-2">
+                  <Share2 className="h-4 w-4" />
+                  <span>Compartilhar</span>
+                </div>
+              )}
             </button>
           </div>
 
