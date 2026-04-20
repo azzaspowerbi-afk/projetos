@@ -1166,7 +1166,7 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-2xl"
+              className="relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-3xl border border-border bg-card p-8 shadow-2xl custom-scrollbar"
             >
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-foreground dark:text-white">{editingProjectId ? "Editar Projeto" : "Novo Projeto"}</h2>
